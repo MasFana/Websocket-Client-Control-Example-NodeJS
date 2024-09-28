@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Control WebSocket Client</title>
+  <style>
+    button {
+      padding: 20px;
+      margin: 10px;
+      font-size: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Control WebSocket Client <span id="status">(Disconnected)</span></h1>
+  <button id="connectControl">Connect to /control</button>
+
+  <h2>Control Commands</h2>
+  <!-- Control buttons for up, down, left, right -->
+  <button id="up">Up</button>
+  <button id="left">Left</button>
+  <button id="right">Right</button>
+  <button id="down">Down</button>
+
+  <br><br>
+  <div id="messages"></div>
+
+  <script>
+    let socketControl;
+
+    // Connect to /control WebSocket
+    document.getElementById('connectControl').addEventListener('click', () => {
+      socketControl = new WebSocket('ws://localhost:8080/control');
+      
+      socketControl.addEventListener('open', () => {
+        console.log('Connected to /control');
+        document.getElementById('status').innerText = '(Connected)';
+      });
+
+      socketControl.addEventListener('message', (event) => {
+        console.log('Message from /control:', event.data);
+        const messagesDiv = document.getElementById('messages');
+        messagesDiv.innerHTML += `<p>${event.data}</p>`;
+      });
+
+      socketControl.addEventListener('close', () => {
+        console.log('Disconnected from /control');
+        document.getElementById('status').innerText = '(Disconnected)';
+      });
+    });
+
+    // Function to send control commands
+    function sendControlCommand(command) {
+      if (socketControl && socketControl.readyState === WebSocket.OPEN) {
+        socketControl.send(command);
+        console.log(`Sent command: ${command}`);
+      }
+    }
+
+    // Handle button press and release events for control commands
+    function setupControlButton(id, command) {
+      const button = document.getElementById(id);
+
+      button.addEventListener('mousedown', () => {
+        sendControlCommand(command);
+      });
+
+      button.addEventListener('mouseup', () => {
+        sendControlCommand('stop');
+      });
+
+      button.addEventListener('touchstart', (e) => {
+        e.preventDefault(); // Prevent touch event conflicts
+        sendControlCommand(command);
+      });
+
+      button.addEventListener('touchend', (e) => {
+        e.preventDefault(); // Prevent touch event conflicts
+        sendControlCommand('stop');
+      });
+    }
+
+    // Setup control buttons
+    setupControlButton('up', 'up');
+    setupControlButton('down', 'down');
+    setupControlButton('left', 'left');
+    setupControlButton('right', 'right');
+  </script>
+</body>
+</html>

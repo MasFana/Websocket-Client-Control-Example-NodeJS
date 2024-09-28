@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Default WebSocket Client</title>
+</head>
+<body>
+  <h1>Default WebSocket Client <span id="status">(Disconnected)</span></h1>
+  <button id="connectDefault">Connect to /default</button>
+
+  <h2>Received Messages</h2>
+  <div id="messages"></div>
+
+  <script>
+    let socketDefault;
+
+    // Connect to /default WebSocket
+    document.getElementById('connectDefault').addEventListener('click', () => {
+      socketDefault = new WebSocket('ws://localhost:8080/client');
+      
+      socketDefault.addEventListener('open', () => {
+        console.log('Connected to /default');
+        document.getElementById('status').innerText = '(Connected)';
+      });
+
+      socketDefault.addEventListener('message', (event) => {
+        console.log('Message from /default:', event.data);
+        const messagesDiv = document.getElementById('messages');
+        messagesDiv.innerHTML += `<p>${event.data}</p>`;
+      });
+
+      socketDefault.addEventListener('close', () => {
+        console.log('Disconnected from /default');
+        document.getElementById('status').innerText = '(Disconnected)';
+      });
+    });
+  </script>
+</body>
+</html>
