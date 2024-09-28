@@ -22,8 +22,8 @@ The server supports WebSocket connections for different endpoints:
 Clone the repository:
 
    ```bash
-   git clone <repository-url>
-   cd <repository-directory>
+   git clone https://github.com/MasFana/Websocket-Client-Control-Example-NodeJS
+   cd Websocket-Client-Control-Example-NodeJS
    ```
 
 ### Running the Server
